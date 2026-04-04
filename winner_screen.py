@@ -4,15 +4,18 @@ import argparse
 import keyboard  # pip install keyboard
 import sys
 
+from base_screen import BaseScreen
+
 COLOUR_BLACK = (0, 0, 0)
 COLOUR_WHITE = (255, 255, 255)
 COLOUR_GREEN = (0, 255, 0)
 COLOUR_RED = (255, 0, 0)
 
 
-class BaseScreen:
+class WinnerScreen(BaseScreen):
     showing = False
     paused = False
+    winner = None
 
     # display location, width, and height
     left: int = None
@@ -29,7 +32,7 @@ class BaseScreen:
         height=320,
         buttons: list = None,
     ):
-        pygame.init()
+        super().__init__(name)
 
         self.name = name
         self.left = left
@@ -37,7 +40,7 @@ class BaseScreen:
         self.width = width
         self.height = height
 
-        self.font = font.SysFont("arial", 50)
+        self.font = font.SysFont("arial", 100)
         self.small_font = font.SysFont("arial", 25)
 
     # def __del__(self):
@@ -59,7 +62,17 @@ class BaseScreen:
         return self.pause
 
     def render(self, screen: Surface):
-        raise NotImplementedError()
+        if self.showing:
+
+            winner_text = self.font.render(
+                f"{self.winner}",
+                True,
+                COLOUR_WHITE,
+            )
+            winner_text_rect = winner_text.get_rect(
+                center=(self.left + self.width / 2, self.top + self.height / 2)
+            )
+            screen.blit(winner_text, winner_text_rect)
 
     def draw_button(
         self,

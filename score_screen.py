@@ -4,13 +4,15 @@ import argparse
 import keyboard  # pip install keyboard
 import sys
 
+from base_screen import BaseScreen
+
 COLOUR_BLACK = (0, 0, 0)
 COLOUR_WHITE = (255, 255, 255)
 COLOUR_GREEN = (0, 255, 0)
 COLOUR_RED = (255, 0, 0)
 
 
-class BaseScreen:
+class ScoreScreen(BaseScreen):
     showing = False
     paused = False
 
@@ -19,6 +21,10 @@ class BaseScreen:
     top: int = None
     width: int = None
     height: int = None
+    bottom: int = None
+    right: int = None
+    player_score = 0
+    cpu_score = 0
 
     def __init__(
         self,
@@ -29,13 +35,15 @@ class BaseScreen:
         height=320,
         buttons: list = None,
     ):
-        pygame.init()
+        super().__init__(name)
 
         self.name = name
         self.left = left
         self.top = top
         self.width = width
         self.height = height
+        self.bottom = top + height
+        self.right = left + width
 
         self.font = font.SysFont("arial", 50)
         self.small_font = font.SysFont("arial", 25)
@@ -59,7 +67,27 @@ class BaseScreen:
         return self.pause
 
     def render(self, screen: Surface):
-        raise NotImplementedError()
+        if self.showing:
+            pygame.draw.lines(
+                screen,
+                COLOUR_WHITE,
+                False,
+                [
+                    (self.left, self.bottom),
+                    (self.left, self.top),
+                    (self.right - 1, self.top),
+                    (self.right - 1, self.bottom),
+                ],
+            )
+            scores = self.font.render(
+                f"{self.player_score} | {self.cpu_score}",
+                True,
+                COLOUR_WHITE,
+            )
+            scores_text_rect = scores.get_rect(
+                center=(self.left + self.width / 2, self.top + self.height / 2)
+            )
+            screen.blit(scores, scores_text_rect)
 
     def draw_button(
         self,

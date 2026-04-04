@@ -40,7 +40,6 @@ class TitleScreen(BaseScreen):
         self.width = width
         self.height = height
 
-        self.display = display.set_mode((self.width, self.height))
         self.font = font.SysFont("arial", 50)
         self.small_font = font.SysFont("arial", 25)
 
@@ -64,9 +63,9 @@ class TitleScreen(BaseScreen):
         self.pause = not self.pause
         return self.pause
 
-    def render(self):
+    def render(self, screen: Surface):
         if self.showing:
-            self.display.fill(COLOUR_BLACK)
+            screen.fill(COLOUR_BLACK)
             title = self.font.render(
                 f"PONG",
                 True,
@@ -75,7 +74,7 @@ class TitleScreen(BaseScreen):
             title_text_rect = title.get_rect(
                 center=(self.left + self.width / 2, self.top + self.height / 2 - 50)
             )
-            self.display.blit(title, title_text_rect)
+            screen.blit(title, title_text_rect)
 
             # button
 
@@ -94,7 +93,7 @@ class TitleScreen(BaseScreen):
             )
 
             self.start_button.is_hovering(mouse_pos)
-            self.start_button.draw_button(self.display, 8)
+            self.start_button.draw_button(screen, 8)
 
             self.exit_button = Button(
                 "exit_button",
@@ -109,7 +108,7 @@ class TitleScreen(BaseScreen):
             )
 
             self.exit_button.is_hovering(mouse_pos)
-            self.exit_button.draw_button(self.display, 8)
+            self.exit_button.draw_button(screen, 8)
 
     def on_button_click(self) -> str:
         # print("Button was clicked!")
