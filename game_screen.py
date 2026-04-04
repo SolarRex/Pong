@@ -13,7 +13,7 @@ COLOUR_GREEN = (0, 255, 0)
 COLOUR_RED = (255, 0, 0)
 
 
-class TitleScreen(BaseScreen):
+class GameScreen(BaseScreen):
     showing = False
     paused = False
 
@@ -52,8 +52,6 @@ class TitleScreen(BaseScreen):
 
     def on_start(self) -> bool:
         self.showing = True
-        print("starting")
-        print("------------------------------")
         return True
 
     def on_end(self) -> bool:
@@ -61,29 +59,31 @@ class TitleScreen(BaseScreen):
         return False
 
     def toggle_pause(self) -> bool:
-        self.pause = not self.pause
-        return self.pause
+        self.paused = not self.paused
+        return self.paused
 
     def render(self):
         if self.showing:
             self.display.fill(COLOUR_BLACK)
-            title = self.font.render(
-                f"PONG",
+
+        if self.paused:
+            paused_text = self.font.render(
+                f"PAUSED",
                 True,
                 COLOUR_WHITE,
             )
-            title_text_rect = title.get_rect(
+            paused_text_rect = paused_text.get_rect(
                 center=(self.left + self.width / 2, self.top + self.height / 2 - 50)
             )
-            self.display.blit(title, title_text_rect)
+            self.display.blit(paused_text, paused_text_rect)
 
             # button
 
             mouse_pos = pygame.mouse.get_pos()
 
-            self.start_button = Button(
-                "start_button",
-                "Start",
+            self.pause_button = Button(
+                "pause_button",
+                "Unpause",
                 COLOUR_BLACK,
                 25,
                 (self.width / 2 - 50, self.height / 2 + 50),
@@ -93,8 +93,8 @@ class TitleScreen(BaseScreen):
                 self.top,
             )
 
-            self.start_button.is_hovering(mouse_pos)
-            self.start_button.draw_button(self.display, 8)
+            self.pause_button.is_hovering(mouse_pos)
+            self.pause_button.draw_button(self.display, 8)
 
             self.exit_button = Button(
                 "exit_button",
@@ -111,56 +111,20 @@ class TitleScreen(BaseScreen):
             self.exit_button.is_hovering(mouse_pos)
             self.exit_button.draw_button(self.display, 8)
 
-    def on_button_click(self) -> bool:
+    def on_button_click(self) -> str:
         # print("Button was clicked!")
-        try:
-            self.start_button
-            if self.start_button.hovered_over:
-                print("Starting Game")
-                return True
-        except:
-            pass
-        try:
-            self.exit_button
-            if self.exit_button.hovered_over:
-                print("Exiting Game")
-                self.on_end()
-                return False
-        except:
-            pass
-
-
-def main():
-
-    screen = TitleScreen("screen", width=500, height=500)
-
-    screen.on_start()
-
-    try:
-        while screen.showing:
-            screen.render()
-
-            display.flip()
-
-            # pygame.QUIT event means the user clicked X to close your window
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    screen.on_end()
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        screen.on_end()
-
-                    if keyboard.is_pressed("p"):
-                        screen.toggle_pause()
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    screen.on_button_click()
-
-    except KeyboardInterrupt:
-        # Handle Ctrl+C gracefully
-        if screen.showing:
-            screen.on_end()
-            print("\nProgram interrupted by user.")
-
-
-if __name__ == "__main__":
-    main()
+        if self.paused:
+            try:
+                self.pause_button
+                if self.pause_button.hovered_over:
+                    return "pause"
+            except:
+                return "didn't press"
+            try:
+                self.exit_button
+                if self.exit_button.hovered_over:
+                    print("Exiting Game")
+                    self.on_end()
+                    return "exit"
+            except:
+                return "didn't press"

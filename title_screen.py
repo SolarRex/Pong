@@ -111,23 +111,22 @@ class TitleScreen(BaseScreen):
             self.exit_button.is_hovering(mouse_pos)
             self.exit_button.draw_button(self.display, 8)
 
-    def on_button_click(self) -> bool:
+    def on_button_click(self) -> str:
         # print("Button was clicked!")
-        try:
-            self.start_button
-            if self.start_button.hovered_over:
-                print("Starting Game")
-                return True
-        except:
-            pass
-        try:
-            self.exit_button
-            if self.exit_button.hovered_over:
-                print("Exiting Game")
-                self.on_end()
-                return False
-        except:
-            pass
+        if self.showing:
+            try:
+                self.start_button
+                if self.start_button.hovered_over:
+                    print("Starting Game")
+                    return "start"
+            except:
+                return "didn't press"
+            try:
+                self.exit_button
+                if self.exit_button.hovered_over:
+                    return "exit"
+            except:
+                return "didn't press"
 
 
 def main():
