@@ -130,24 +130,6 @@ class GameScreen(BaseScreen):
 
     def render(self, screen: Surface):
         if self.showing:
-            pygame.draw.lines(
-                screen,
-                COLOUR_WHITE,
-                False,
-                [
-                    (self.left, self.top),
-                    (self.right, self.top),
-                ],
-            )
-            pygame.draw.lines(
-                screen,
-                COLOUR_WHITE,
-                False,
-                [
-                    (self.left, self.bottom - 1),
-                    (self.right, self.bottom - 1),
-                ],
-            )
             self.player_paddle.draw_paddle(screen)
             self.cpu_paddle.draw_paddle(screen)
             self.ball.draw_ball(screen)

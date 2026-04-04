@@ -71,12 +71,12 @@ class ScoreScreen(BaseScreen):
             pygame.draw.lines(
                 screen,
                 COLOUR_WHITE,
-                False,
+                True,
                 [
-                    (self.left, self.bottom),
+                    (self.left, self.bottom - 1),
                     (self.left, self.top),
                     (self.right - 1, self.top),
-                    (self.right - 1, self.bottom),
+                    (self.right - 1, self.bottom - 1),
                 ],
             )
             scores = self.font.render(
