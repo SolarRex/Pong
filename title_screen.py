@@ -43,6 +43,37 @@ class TitleScreen(BaseScreen):
         self.font = font.SysFont("arial", 50)
         self.small_font = font.SysFont("arial", 25)
 
+        self.title = self.font.render(
+            f"PONG",
+            True,
+            COLOUR_WHITE,
+        )
+        self.title_text_rect = self.title.get_rect(
+            center=(self.left + self.width / 2, self.top + self.height / 2 - 50)
+        )
+        self.start_button = Button(
+            "start_button",
+            "Start",
+            COLOUR_BLACK,
+            25,
+            (self.width / 2 - 50, self.height / 2 + 50),
+            COLOUR_GREEN,
+            COLOUR_RED,
+            self.left,
+            self.top,
+        )
+        self.exit_button = Button(
+            "exit_button",
+            "Exit",
+            COLOUR_BLACK,
+            25,
+            (self.width / 2 + 50, self.height / 2 + 50),
+            COLOUR_GREEN,
+            COLOUR_RED,
+            self.left,
+            self.top,
+        )
+
     # def __del__(self):
     #     try:
     #         self.on_end()
@@ -63,49 +94,15 @@ class TitleScreen(BaseScreen):
         self.pause = not self.pause
         return self.pause
 
-    def render(self, screen: Surface):
+    def render(self, screen: Surface, mouse_pos=None):
         if self.showing:
-            screen.fill(COLOUR_BLACK)
-            title = self.font.render(
-                f"PONG",
-                True,
-                COLOUR_WHITE,
-            )
-            title_text_rect = title.get_rect(
-                center=(self.left + self.width / 2, self.top + self.height / 2 - 50)
-            )
-            screen.blit(title, title_text_rect)
+
+            screen.blit(self.title, self.title_text_rect)
 
             # button
 
-            mouse_pos = pygame.mouse.get_pos()
-
-            self.start_button = Button(
-                "start_button",
-                "Start",
-                COLOUR_BLACK,
-                25,
-                (self.width / 2 - 50, self.height / 2 + 50),
-                COLOUR_GREEN,
-                COLOUR_RED,
-                self.left,
-                self.top,
-            )
-
             self.start_button.is_hovering(mouse_pos)
             self.start_button.draw_button(screen, 8)
-
-            self.exit_button = Button(
-                "exit_button",
-                "Exit",
-                COLOUR_BLACK,
-                25,
-                (self.width / 2 + 50, self.height / 2 + 50),
-                COLOUR_GREEN,
-                COLOUR_RED,
-                self.left,
-                self.top,
-            )
 
             self.exit_button.is_hovering(mouse_pos)
             self.exit_button.draw_button(screen, 8)

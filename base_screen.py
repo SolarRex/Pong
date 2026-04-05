@@ -58,7 +58,7 @@ class BaseScreen:
         self.pause = not self.pause
         return self.pause
 
-    def render(self, screen: Surface):
+    def render(self, screen: Surface, mouse_pos=None):
         raise NotImplementedError()
 
     def draw_button(

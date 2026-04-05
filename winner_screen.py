@@ -15,7 +15,7 @@ COLOUR_RED = (255, 0, 0)
 class WinnerScreen(BaseScreen):
     showing = False
     paused = False
-    winner = None
+    winner = ""
 
     # display location, width, and height
     left: int = None
@@ -43,14 +43,16 @@ class WinnerScreen(BaseScreen):
         self.font = font.SysFont("arial", 100)
         self.small_font = font.SysFont("arial", 25)
 
-    # def __del__(self):
-    #     try:
-    #         self.on_end()
-    #     except:
-    #         pass
-
     def on_start(self) -> bool:
         self.showing = True
+        self.winner_text = self.font.render(
+            f"{self.winner}",
+            True,
+            COLOUR_WHITE,
+        )
+        self.winner_text_rect = self.winner_text.get_rect(
+            center=(self.left + self.width / 2, self.top + self.height / 2)
+        )
         return True
 
     def on_end(self) -> bool:
@@ -63,16 +65,13 @@ class WinnerScreen(BaseScreen):
 
     def render(self, screen: Surface):
         if self.showing:
+            screen.blit(self.winner_text, self.winner_text_rect)
 
-            winner_text = self.font.render(
-                f"{self.winner}",
-                True,
-                COLOUR_WHITE,
-            )
-            winner_text_rect = winner_text.get_rect(
-                center=(self.left + self.width / 2, self.top + self.height / 2)
-            )
-            screen.blit(winner_text, winner_text_rect)
+    def set_winner(self, player_won: bool):
+        if player_won:
+            self.winner = "You Win!"
+        else:
+            self.winner = "You Lose!"
 
     def draw_button(
         self,

@@ -26,6 +26,8 @@ class ScoreScreen(BaseScreen):
     player_score = 0
     cpu_score = 0
 
+    fps = 0
+
     def __init__(
         self,
         name,
@@ -68,6 +70,11 @@ class ScoreScreen(BaseScreen):
 
     def render(self, screen: Surface):
         if self.showing:
+            fps_text = self.small_font.render(
+                f"FPS: {self.fps:.0f}", True, COLOUR_WHITE
+            )
+            screen.blit(fps_text, (self.left + 10, self.top + 10))
+
             pygame.draw.lines(
                 screen,
                 COLOUR_WHITE,

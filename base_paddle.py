@@ -31,23 +31,34 @@ class BasePaddle:
         self.centerx = left - width / 2
         self.centery = top + height / 2
 
-    def set_movement(self, up: int = 0) -> int:
-        """-1 is moving up, 1 is moving down, 0 for not moving"""
-        self.moving_up = up
-        return self.moving_up
-
-    def update_position(self, speed: float):
-        self.top = self.top + speed * self.moving_up
-        self.bottom = self.top + self.height
-        self.centery = self.top + self.height / 2
-
-    def draw_paddle(self, screen: Surface):
         self.paddle_box = pygame.Rect(
             self.left,
             self.top,
             self.width,
             self.height,
         )
+
+    def set_movement(self, up: int = 0) -> int:
+        """-1 is moving up, 1 is moving down, 0 for not moving"""
+        self.moving_up = up
+        return self.moving_up
+
+    def update_position(self, speed: float):
+        velocity = speed * self.moving_up
+        self.top = self.top + velocity
+        self.bottom = self.bottom + velocity
+        self.centery = self.centery + velocity
+
+        self.paddle_box.top = self.top
+
+    def set_position(self, top):
+        self.top = top
+        self.bottom = self.top + self.height
+        self.centery = self.top + self.height / 2
+
+        self.paddle_box.top = self.top
+
+    def draw_paddle(self, screen: Surface):
         pygame.draw.rect(
             screen,
             COLOUR_WHITE,
