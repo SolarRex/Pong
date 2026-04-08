@@ -34,7 +34,7 @@ class GameScreen(BaseScreen):
     cpu_hold_dir = 0
     ball_speedx_max = 0.1
     ball_speedx_min = 0.05
-    ball_speedy_max = 0.3
+    ball_speedy_max = 0.2
     ball_speedy_min = 0.005
     bot_difficulty = 1
     number_of_balls = 1
@@ -62,22 +62,35 @@ class GameScreen(BaseScreen):
         self.number_of_balls = number_of_balls
         self.player_score = player_score
 
+        self.screen_multipliery = self.height / 400
+        self.screen_multiplierx = self.width / 500
+
         self.font = font.SysFont("arial", 50)
         self.small_font = font.SysFont("arial", 25)
 
         self.player_paddle = BasePaddle(
-            "player_paddle", self.left + 20, self.height / 2
+            "player_paddle",
+            self.left + 20,
+            self.height / 2,
+            width=5,
+            height=50 * self.screen_multipliery,
         )
 
         self.cpu_paddle = BasePaddle(
-            "cpu_paddle", self.left + self.width - 20, self.height / 2
+            "cpu_paddle",
+            self.left + self.width - 20,
+            self.height / 2,
+            width=5,
+            height=50 * self.screen_multipliery,
         )
         self.list_of_balls: list[BaseBall] = []
         # self.ball_dict: dict[str, BaseBall] = []
         for num in range(self.number_of_balls):
             self.list_of_balls.append(
                 BaseBall(
-                    f"ball_{num}", self.left + self.width / 2, self.top + self.width / 2
+                    f"ball_{num}",
+                    self.left + self.width / 2,
+                    self.top + self.width / 2,
                 )
             )
 
@@ -178,9 +191,11 @@ class GameScreen(BaseScreen):
                 ball.draw_ball(screen)
 
             if not self.paused:
-                self.cpu_paddle.update_position(0.01 * self.bot_difficulty)
+                self.cpu_paddle.update_position(
+                    0.01 * self.bot_difficulty * self.screen_multipliery
+                )
 
-                self.player_paddle.update_position(0.1)
+                self.player_paddle.update_position(0.1 * self.screen_multipliery)
 
                 if self.cpu_paddle.centery > self.list_of_balls[0].centery:
                     if self.cpu_paddle.top >= self.top:
@@ -219,7 +234,9 @@ class GameScreen(BaseScreen):
                         self.reset_balls()
                         print(self.player_score)
 
-                    ball.update_position()
+                    ball.update_position(
+                        self.screen_multipliery, self.screen_multiplierx
+                    )
 
             else:
                 screen.blit(self.paused_text, self.paused_text_rect)

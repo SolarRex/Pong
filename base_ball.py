@@ -48,13 +48,13 @@ class BaseBall:
         self.moving_left = left
         return (self.moving_up, self.moving_left)
 
-    def update_position(self):
-        velocityy = self.speedy * self.moving_up
+    def update_position(self, multipliery, multiplierx):
+        velocityy = self.speedy * self.moving_up * multipliery
         self.top = self.top + velocityy
         self.bottom = self.bottom + velocityy
         self.centery = self.centery + velocityy
 
-        velocityx = self.speedx * self.moving_left
+        velocityx = self.speedx * self.moving_left * multiplierx
         self.left = self.left + velocityx
         self.right = self.right + velocityx
         self.centerx = self.centerx + velocityx

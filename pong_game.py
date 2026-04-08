@@ -2,8 +2,12 @@ import pygame
 from pygame import Surface, display, font, transform, mouse
 import argparse
 import sys
-from pynput.keyboard import Key, Listener
+
+# from pynput.keyboard import Key, Listener
+from pynput import keyboard, mouse
 import time
+import threading
+import tkinter as tk
 
 from base_screen import BaseScreen
 from button import Button
@@ -11,12 +15,17 @@ from title_screen import TitleScreen
 from game_screen import GameScreen
 from score_screen import ScoreScreen
 from winner_screen import WinnerScreen
+from IO import Listener
 
 
 COLOUR_BLACK = (0, 0, 0)
 COLOUR_WHITE = (255, 255, 255)
 COLOUR_GREEN = (0, 255, 0)
 COLOUR_RED = (255, 0, 0)
+DEFAULT_WIDTH = "500"
+DEFAULT_HEIGHT = "500"
+TRUE_SET = {"true", "t", "y", "yes", "1"}
+FALSE_SET = {"false", "f", "n", "no", "0"}
 
 
 class Pong:
@@ -33,16 +42,20 @@ class Pong:
     ave = 0.0
     count = 0
 
-    def __init__(self, width, height, fullscreen, number_of_balls):
-        self.width = width
-        self.height = height
+    def __init__(self, width, height, fullscreen, xfullscreen, number_of_balls):
+        if fullscreen in TRUE_SET:
+            self.width, self.height = self.get_screen_resolution()
+        else:
+            self.width = width
+            self.height = height
+
         self.number_of_balls = number_of_balls
         self.title_screen: BaseScreen = TitleScreen(
             "title_screen", width=self.width, height=self.height
         )
         self.game_screen: BaseScreen = GameScreen(
             "game_screen",
-            top=100,
+            top=self.height / 5,
             width=self.width,
             height=self.height * 4 / 5,
             number_of_balls=self.number_of_balls,
@@ -53,7 +66,7 @@ class Pong:
         self.winner_screen: BaseScreen = WinnerScreen(
             "winner_screen", width=self.width, height=self.height
         )
-        if fullscreen:
+        if xfullscreen in TRUE_SET:
             self.display = pygame.display.set_mode(
                 (self.width, self.height), pygame.FULLSCREEN
             )
@@ -65,9 +78,20 @@ class Pong:
         self.clock = pygame.time.Clock()
         self.previous_time_tick = time.time()
 
+    def on_callback(self, callable):
+        threading.Thread(target=callable, daemon=True).start()
+
     def on_start(self):
+
         self.running = True
         self.title_screen.on_start()
+        # self.listeners = Listener(
+        #     keyboard.Listener(
+        #         on_press=self.on_key_press, on_release=self.on_key_release
+        #     ),
+        #     mouse.Listener(on_click=self.on_click),
+        # )
+        # self.on_callback(self.listeners.on_start)
         self.player_score = 0
         self.cpu_score = 0
         self.game_screen.player_score = self.player_score
@@ -87,7 +111,9 @@ class Pong:
         self.game_screen.on_end()
         self.score_screen.on_end()
         self.winner_screen.on_end()
+        # self.on_callback(self.listeners.on_end)
         print("Restarting")
+        time.sleep(2)
         self.on_start()
 
     def on_end(self):
@@ -96,6 +122,7 @@ class Pong:
         self.game_screen.on_end()
         self.score_screen.on_end()
         self.winner_screen.on_end()
+        # self.on_callback(self.listeners.on_end)
         print("exiting")
         print("------------------------------")
         print(f"Top FPS was {self.top_fps}")
@@ -113,6 +140,51 @@ class Pong:
 
         return self.paused
 
+    # --- Keyboard event handlers ---
+    def on_key_press(self, key):
+        # print(f"Key pressed: {key}")  # Printable keys
+        if key == keyboard.Key.up:
+            if self.game_screen.player_paddle.top > self.game_screen.top:
+                self.game_screen.player_paddle.set_movement(-1)
+            else:
+                self.game_screen.player_paddle.set_movement(0)
+                # self.game_screen.player_paddle.top = self.game_screen.top #brute force method
+        elif key == keyboard.Key.down:
+            if self.game_screen.player_paddle.bottom < self.game_screen.bottom:
+                self.game_screen.player_paddle.set_movement(1)
+            else:
+                self.game_screen.player_paddle.set_movement(0)
+
+    def on_key_release(self, key):
+        print(f"Key released: {key}")
+        if key == keyboard.Key.esc:  # Stop listener on ESC
+            print("Stopping listeners...")
+            self.on_end()
+            return False  # Returning False stops the listener
+        elif key == keyboard.Key.up or key == keyboard.Key.down:
+            self.game_screen.player_paddle.set_movement(0)
+
+    # --- Mouse event handlers ---
+    def on_click(self, x, y, button, pressed):
+        if pressed:
+            print(f"Mouse button {button} pressed at ({x}, {y})")
+        else:
+            print(f"Mouse button {button} released at ({x}, {y})")
+
+    def get_screen_resolution(self):
+        try:
+            root = tk.Tk()
+            root.withdraw()  # Hide the main window
+            width = root.winfo_screenwidth()
+            height = root.winfo_screenheight()
+            root.destroy()
+            return width, height
+        except Exception as e:
+            print(
+                f"Error retrieving resolution: {e}. Setting to default resolution ({DEFAULT_WIDTH}, {DEFAULT_HEIGHT})"
+            )
+            return None, None
+
 
 def main():
     parser = argparse.ArgumentParser(description="Start the game with bot difficulty")
@@ -125,19 +197,25 @@ def main():
     parser.add_argument(
         "--width",
         type=str,
-        default="500",
+        default=DEFAULT_WIDTH,
         help="Sets the width of the screen.",
     )
     parser.add_argument(
         "--height",
         type=str,
-        default="500",
+        default=DEFAULT_HEIGHT,
         help="Sets the height of the screen.",
     )
     parser.add_argument(
+        "--fullscreen",
+        type=str,
+        default="False",
+        help="Sets to the monitors resolution.",
+    )
+    parser.add_argument(
         "--exclusive_fullscreen",
-        type=bool,
-        default=False,
+        type=str,
+        default="False",
         help="Sets to exclusive fullscreen.",
     )
     parser.add_argument(
@@ -148,14 +226,21 @@ def main():
     )
 
     args = parser.parse_args()
+    args_info = {
+        "width": int(args.width),
+        "height": int(args.height),
+        "fullscreen": args.fullscreen.lower(),
+        "xfullscreen": args.exclusive_fullscreen.lower(),
+        "number_of_balls": int(args.number_of_balls),
+    }
 
     pong_game = Pong(
-        int(args.width),
-        int(args.height),
-        args.exclusive_fullscreen,
-        int(args.number_of_balls),
+        width=args_info["width"],
+        height=args_info["height"],
+        fullscreen=args_info["fullscreen"],
+        xfullscreen=args_info["xfullscreen"],
+        number_of_balls=args_info["number_of_balls"],
     )
-    pong_game.bot_difficulty = int(args.bot_difficulty)
     pong_game.on_start()
 
     pong_game.count = 0
@@ -203,7 +288,6 @@ def main():
                 pong_game.score_screen.render(pong_game.display)
 
             pong_game.winner_screen.render(pong_game.display)
-            display.flip()
 
             # pygame.QUIT event means the user clicked X to close your window
             keys = pygame.key.get_pressed()
@@ -223,7 +307,6 @@ def main():
                     pong_game.game_screen.player_paddle.set_movement(0)
             else:
                 pong_game.game_screen.player_paddle.set_movement(0)
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pong_game.on_end()
@@ -258,6 +341,7 @@ def main():
                             pong_game.on_end()
                     except:
                         pass
+            display.flip()
 
     except KeyboardInterrupt:
         # Handle Ctrl+C gracefully

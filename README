@@ -1,0 +1,8 @@
+To run type python pong_game.py 
+
+Inputs include, --bot_difficulty, --width, --height, --fullscreen, --exclusive_fullscreen, --number_of_balls
+bot difficulty: 1 easiest, -> 10 hardest.
+width and height: Chooses the width and height of the game screen.
+fullscreen: Overrides width and height, sets the width and height based on the screen.
+exclusive fullscreen: self explanatory
+number of balls: also self explanatory
