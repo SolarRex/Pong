@@ -183,8 +183,54 @@ class GameScreen(BaseScreen):
 
         return self.paused
 
+    def draw_dashed_line(
+        self, surface, color, start_pos, end_pos, dash_length=10, gap_length=5, width=1
+    ):
+        """
+        Draws a dashed line between two points.
+
+        :param surface: Pygame surface to draw on
+        :param color: RGB tuple for color
+        :param start_pos: (x, y) start position
+        :param end_pos: (x, y) end position
+        :param dash_length: length of each dash in pixels
+        :param gap_length: length of gap between dashes in pixels
+        :param width: thickness of the line
+        """
+        x1, y1 = start_pos
+        x2, y2 = end_pos
+
+        # Calculate total length of the line
+        dx = x2 - x1
+        dy = y2 - y1
+        length = (dx**2 + dy**2) ** 0.5
+
+        # Calculate unit vector
+        if length == 0:
+            return  # Avoid division by zero
+        dx /= length
+        dy /= length
+
+        # Draw dashes
+        dist = 0
+        while dist < length:
+            start_x = x1 + dx * dist
+            start_y = y1 + dy * dist
+            end_x = x1 + dx * min(dist + dash_length, length)
+            end_y = y1 + dy * min(dist + dash_length, length)
+            pygame.draw.line(surface, color, (start_x, start_y), (end_x, end_y), width)
+            dist += dash_length + gap_length
+
     def render(self, screen: Surface, mouse_pos=None):
         if self.showing:
+            self.draw_dashed_line(
+                screen,
+                COLOUR_WHITE,
+                (self.width / 2, self.top),
+                (self.width / 2, self.bottom),
+                dash_length=5,
+                gap_length=10,
+            )
             self.player_paddle.draw_paddle(screen)
             self.cpu_paddle.draw_paddle(screen)
             for ball in self.list_of_balls:
