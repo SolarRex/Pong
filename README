@@ -4,5 +4,5 @@ Inputs include, --bot_difficulty, --width, --height, --fullscreen, --exclusive_f
 bot difficulty: 1 easiest, -> 10 hardest.
 width and height: Chooses the width and height of the game screen.
 fullscreen: Overrides width and height, sets the width and height based on the screen.
-exclusive fullscreen: self explanatory
+exclusive fullscreen: self explanatory (resolution depends on the width and height)
 number of balls: also self explanatory
