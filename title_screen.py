@@ -5,7 +5,7 @@ import keyboard  # pip install keyboard
 import sys
 
 from base_screen import BaseScreen
-from button import Button
+from base_button import Button
 
 COLOUR_BLACK = (0, 0, 0)
 COLOUR_WHITE = (255, 255, 255)

@@ -6,7 +6,7 @@ import sys
 import random
 
 from base_screen import BaseScreen
-from button import Button
+from base_button import Button
 from base_paddle import BasePaddle
 from base_ball import BaseBall
 

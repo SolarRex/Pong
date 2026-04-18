@@ -10,7 +10,7 @@ import threading
 import tkinter as tk
 
 from base_screen import BaseScreen
-from button import Button
+from base_button import Button
 from title_screen import TitleScreen
 from game_screen import GameScreen
 from score_screen import ScoreScreen
@@ -187,7 +187,7 @@ class Pong:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Start the game with bot difficulty")
+    parser = argparse.ArgumentParser(description="Start the game with settings")
     parser.add_argument(
         "--bot_difficulty",
         type=str,
